@@ -9,4 +9,6 @@ public interface ProjectPort {
     Optional<Project> findById(Long id, String tenantId);
     Project save(Project project);
     void delete(Long id, String tenantId);
+    long count(String tenantId);
+    List<Project> getLatest(int limit, String tenantId);
 }

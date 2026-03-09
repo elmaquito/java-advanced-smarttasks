@@ -45,4 +45,14 @@ public class ProjectServiceImpl implements ProjectUseCase {
     public void delete(Long id, String tenantId) {
         projectPort.delete(id, tenantId);
     }
+
+    @Override
+    public long count(String tenantId) {
+        return projectPort.count(tenantId);
+    }
+
+    @Override
+    public List<Project> getLatest(int limit, String tenantId) {
+        return projectPort.getLatest(limit, tenantId);
+    }
 }

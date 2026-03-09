@@ -73,4 +73,14 @@ public class TaskServiceImpl implements TaskUseCase {
     public Page<Task> getTasksByProjectId(Long projectId, Pageable pageable, String tenantId) {
         return taskPort.findByProjectId(projectId, pageable, tenantId);
     }
+
+    @Override
+    public long count(String tenantId) {
+        return taskPort.count(tenantId);
+    }
+
+    @Override
+    public long countOverdue(String tenantId) {
+        return taskPort.countOverdue(tenantId);
+    }
 }

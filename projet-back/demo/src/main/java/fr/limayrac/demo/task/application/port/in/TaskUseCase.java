@@ -14,4 +14,6 @@ public interface TaskUseCase {
     Optional<Task> getTaskById(Long id, String tenantId);
     List<Task> getAllTasks(String tenantId);
     Page<Task> getTasksByProjectId(Long projectId, Pageable pageable, String tenantId);
+    long count(String tenantId);
+    long countOverdue(String tenantId);
 }

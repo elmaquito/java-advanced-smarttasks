@@ -25,4 +25,18 @@ public interface ProjectRepository extends JpaRepository<ProjectEntity, Long> {
            WHERE p.tenantId = :tenantId
            """)
     List<ProjectListResponse> findAllProjectSummaries(String tenantId);
+
+    long countByTenantId(String tenantId);
+    
+    @Query("""
+           SELECT new fr.limayrac.demo.dto.ProjectListResponse(
+               p.id,
+               p.name,
+               p.createdOn
+           )
+           FROM ProjectEntity p
+           WHERE p.tenantId = :tenantId
+           ORDER BY p.createdOn DESC
+           """)
+    List<ProjectListResponse> findLatest(String tenantId, Pageable pageable);
 }

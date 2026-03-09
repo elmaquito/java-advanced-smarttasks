@@ -13,4 +13,6 @@ public interface TaskPort {
     void deleteById(Long id, String tenantId);
     List<Task> findAll(String tenantId);
     Page<Task> findByProjectId(Long projectId, Pageable pageable, String tenantId);
+    long count(String tenantId);
+    long countOverdue(String tenantId);
 }

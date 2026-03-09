@@ -9,4 +9,6 @@ public interface ProjectUseCase {
     List<Project> getAll(String tenantId);
     Project update(Long id, String name, String tenantId);
     void delete(Long id, String tenantId);
+    long count(String tenantId);
+    List<Project> getLatest(int limit, String tenantId);
 }

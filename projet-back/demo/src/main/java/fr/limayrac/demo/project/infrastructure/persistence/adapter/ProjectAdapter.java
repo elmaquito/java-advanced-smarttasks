@@ -45,6 +45,22 @@ public class ProjectAdapter implements ProjectPort {
                 .ifPresent(projectRepository::delete);
     }
 
+    @Override
+    public long count(String tenantId) {
+        return projectRepository.countByTenantId(tenantId);
+    }
+
+    @Override
+    public List<Project> getLatest(int limit, String tenantId) {
+        return projectRepository.findAllByTenantId(
+                tenantId,
+                org.springframework.data.domain.PageRequest.of(0, limit, org.springframework.data.domain.Sort.by(org.springframework.data.domain.Sort.Direction.DESC, "createdOn"))
+        )
+        .stream()
+        .map(this::toDomain)
+        .collect(Collectors.toList());
+    }
+
     private Project toDomain(ProjectEntity entity) {
         return Project.builder()
                 .id(entity.getId())

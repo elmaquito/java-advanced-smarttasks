@@ -52,6 +52,16 @@ public class TaskAdapter implements TaskPort {
                 .map(this::toDomain);
     }
 
+    @Override
+    public long count(String tenantId) {
+        return taskRepository.countByTenantId(tenantId);
+    }
+
+    @Override
+    public long countOverdue(String tenantId) {
+        return taskRepository.countByTenantIdAndDueDateBeforeAndCompletedFalse(tenantId, java.time.LocalDate.now());
+    }
+
     private Task toDomain(TaskEntity entity) {
         return new Task(
                 entity.getId(),

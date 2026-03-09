@@ -15,4 +15,8 @@ public interface TaskRepository extends JpaRepository<TaskEntity, Long> {
     List<TaskEntity> findAllByTenantId(String tenantId);
 
     Page<TaskEntity> findAllByProjectIdAndTenantId(Long projectId, String tenantId, Pageable pageable);
+
+    long countByTenantId(String tenantId);
+
+    long countByTenantIdAndDueDateBeforeAndCompletedFalse(String tenantId, java.time.LocalDate date);
 }
