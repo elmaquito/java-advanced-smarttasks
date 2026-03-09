@@ -1,0 +1,23 @@
+spring:
+  application:
+    name: demo
+  datasource:
+    url: jdbc:postgresql://localhost:5432/smarttasks
+    username: smart
+    password: smart
+  jpa:
+    hibernate:
+      ddl-auto: update # Crée/Met à jour les tables automatiquement (utile en dev)
+    show-sql: true     # Affiche les requêtes SQL dans la console
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: https://accounts.google.com
+
+minio:
+  url: ${MINIO_URL:http://localhost:9000}
+  access-key: ${MINIO_ACCESS_KEY:admin}
+  secret-key: ${MINIO_SECRET_KEY:password}
+  bucket-name: smarttasks
+
