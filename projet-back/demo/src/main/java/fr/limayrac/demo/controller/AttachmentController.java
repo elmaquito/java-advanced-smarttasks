@@ -32,24 +32,32 @@ public class AttachmentController {
     @Operation(summary = "Lister les pièces jointes d'une tâche", description = "Retourne la liste des fichiers attachés à une tâche avec pagination")
     @ApiResponse(responseCode = "200", description = "Liste récupérée")
     @GetMapping("/{taskId}/attachments")
-    public Page<AttachmentResponse> findAll(@PathVariable Long taskId, Pageable pageable) {
-        return attachmentService.findAllByTaskId(taskId, pageable);
+    public Page<AttachmentResponse> findAll(
+            @PathVariable Long taskId, 
+            Pageable pageable,
+            @RequestHeader(value = "X-Tenant-ID", defaultValue = "default") String tenantId) {
+        return attachmentService.findAllByTaskId(taskId, pageable, tenantId);
     }
 
     @Operation(summary = "Téléverser une pièce jointe", description = "Ajoute un fichier à une tâche spécifique")
     @ApiResponse(responseCode = "200", description = "Fichier téléversé avec succès", content = @Content(mediaType = "application/json", schema = @Schema(implementation = AttachmentResponse.class)))
     @ApiResponse(responseCode = "404", description = "Tâche non trouvée")
     @PostMapping(value = "/{taskId}/attachments", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public AttachmentResponse upload(@PathVariable Long taskId, @RequestParam("file") MultipartFile file) {
-        return attachmentService.create(taskId, file);
+    public AttachmentResponse upload(
+            @PathVariable Long taskId, 
+            @RequestParam("file") MultipartFile file,
+            @RequestHeader(value = "X-Tenant-ID", defaultValue = "default") String tenantId) {
+        return attachmentService.create(taskId, file, tenantId);
     }
 
     @Operation(summary = "Télécharger une pièce jointe", description = "Télécharge le fichier associé à l'ID de pièce jointe fourni")
     @ApiResponse(responseCode = "200", description = "Fichier téléchargé avec succès")
     @ApiResponse(responseCode = "404", description = "Pièce jointe non trouvée")
     @GetMapping("/{id}/download")
-    public ResponseEntity<InputStreamResource> downloadAttachment(@PathVariable Long id) {
-        DownloadResult result = attachmentService.download(id);
+    public ResponseEntity<InputStreamResource> downloadAttachment(
+            @PathVariable Long id,
+            @RequestHeader(value = "X-Tenant-ID", defaultValue = "default") String tenantId) {
+        DownloadResult result = attachmentService.download(id, tenantId);
 
         String encodedName = URLEncoder.encode(result.fileName(), StandardCharsets.UTF_8);
 

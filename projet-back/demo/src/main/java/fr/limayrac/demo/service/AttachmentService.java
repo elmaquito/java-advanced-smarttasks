@@ -25,15 +25,15 @@ public class AttachmentService {
     private final MinioService minioService;
 
     @Transactional
-    public AttachmentResponse create(Long taskId, MultipartFile file) {
-        TaskEntity task = taskRepository.findByIdAndTenantId(taskId, TenantContext.getTenant())
+    public AttachmentResponse create(Long taskId, MultipartFile file, String tenantId) {
+        TaskEntity task = taskRepository.findByIdAndTenantId(taskId, tenantId)
                 .orElseThrow(() -> new RuntimeException("Task not found"));
 
         try {
             String objectKey = minioService.uploadFile(file);
 
             Attachment attachment = new Attachment();
-            attachment.setTenantId(TenantContext.getTenant());
+            attachment.setTenantId(tenantId);
             attachment.setTask(task);
             attachment.setObjectKey(objectKey);
             attachment.setOriginalName(file.getOriginalFilename());
@@ -47,13 +47,13 @@ public class AttachmentService {
         }
     }
 
-    public Page<AttachmentResponse> findAllByTaskId(Long taskId, Pageable pageable) {
-        return attachmentRepository.findAllByTaskIdAndTenantId(taskId, TenantContext.getTenant(), pageable)
+    public Page<AttachmentResponse> findAllByTaskId(Long taskId, Pageable pageable, String tenantId) {
+        return attachmentRepository.findAllByTaskIdAndTenantId(taskId, tenantId, pageable)
                 .map(this::mapToResponse);
     }
 
-    public DownloadResult download(Long id) {
-        Attachment attachment = attachmentRepository.findByIdAndTenantId(id, TenantContext.getTenant())
+    public DownloadResult download(Long id, String tenantId) {
+        Attachment attachment = attachmentRepository.findByIdAndTenantId(id, tenantId)
                 .orElseThrow(() -> new RuntimeException("Attachment not found"));
 
         try {

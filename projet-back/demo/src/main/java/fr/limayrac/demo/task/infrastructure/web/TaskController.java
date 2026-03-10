@@ -30,16 +30,19 @@ public class TaskController {
 
     @Operation(summary = "Lister toutes les tâches")
     @GetMapping
-    public List<TaskResponse> findAll() {
-        return taskUseCase.getAllTasks(TenantContext.getTenant()).stream()
+    public List<TaskResponse> findAll(
+            @RequestHeader(value = "X-Tenant-ID", defaultValue = "default") String tenantId) {
+        return taskUseCase.getAllTasks(tenantId).stream()
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
     }
 
     @Operation(summary = "Récupérer une tâche")
     @GetMapping("/{id}")
-    public TaskResponse findById(@PathVariable Long id) {
-        return taskUseCase.getTaskById(id, TenantContext.getTenant())
+    public TaskResponse findById(
+            @PathVariable Long id,
+            @RequestHeader(value = "X-Tenant-ID", defaultValue = "default") String tenantId) {
+        return taskUseCase.getTaskById(id, tenantId)
                 .map(this::mapToResponse)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Task not found"));
     }
@@ -53,22 +56,27 @@ public class TaskController {
 
     @Operation(summary = "Mettre à jour une tâche")
     @PutMapping("/{id}")
-    public TaskResponse update(@PathVariable Long id, @Valid @RequestBody TaskRequest request) {
+    public TaskResponse update(
+            @PathVariable Long id, 
+            @Valid @RequestBody TaskRequest request,
+            @RequestHeader(value = "X-Tenant-ID", defaultValue = "default") String tenantId) {
         Task taskUpdates = new Task();
         taskUpdates.setTitle(request.title());
         taskUpdates.setDescription(request.description());
         taskUpdates.setDueDate(request.dueDate());
         // taskUpdates.setCompleted(request.completed()); // Check TaskRequest for completed field
 
-        Task updated = taskUseCase.updateTask(id, taskUpdates, TenantContext.getTenant());
+        Task updated = taskUseCase.updateTask(id, taskUpdates, tenantId);
         return mapToResponse(updated);
     }
 
     @Operation(summary = "Supprimer une tâche")
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@PathVariable Long id) {
-        taskUseCase.deleteTask(id, TenantContext.getTenant());
+    public void delete(
+            @PathVariable Long id,
+            @RequestHeader(value = "X-Tenant-ID", defaultValue = "default") String tenantId) {
+        taskUseCase.deleteTask(id, tenantId);
     }
 
     private TaskResponse mapToResponse(Task task) {
