@@ -14,6 +14,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 @RequestMapping("/api/projects/{projectId}/tasks")
@@ -25,14 +26,14 @@ public class TaskInProjectController {
 
     @Operation(summary = "Lister les tâches d'un projet")
     @GetMapping
-    public Page<TaskListResponse> findAllByProjectId(
+    public Page<TaskResponse> findAllByProjectId(
             @RequestHeader(value = "X-Tenant-ID", defaultValue = "default") String tenantId,
             @PathVariable Long projectId,
             Pageable pageable
     ) {
         try {
             return taskUseCase.getTasksByProjectId(projectId, pageable, tenantId)
-                    .map(this::mapToListResponse);
+                    .map(this::mapToResponse);
         } catch (RuntimeException e) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Erreur lors de la récupération des tâches", e);
         }
