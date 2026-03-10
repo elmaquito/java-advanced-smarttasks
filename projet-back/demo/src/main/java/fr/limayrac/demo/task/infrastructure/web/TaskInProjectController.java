@@ -25,23 +25,41 @@ public class TaskInProjectController {
 
     @Operation(summary = "Lister les tâches d'un projet")
     @GetMapping
-    public Page<TaskListResponse> findAllByProjectId(@PathVariable Long projectId, Pageable pageable) {
-        return taskUseCase.getTasksByProjectId(projectId, pageable, TenantContext.getTenant())
-                .map(this::mapToListResponse);
+    public Page<TaskListResponse> findAllByProjectId(
+            @RequestHeader(value = "X-Tenant-ID", defaultValue = "default") String tenantId,
+            @PathVariable Long projectId,
+            Pageable pageable
+    ) {
+        try {
+            return taskUseCase.getTasksByProjectId(projectId, pageable, tenantId)
+                    .map(this::mapToListResponse);
+        } catch (RuntimeException e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Erreur lors de la récupération des tâches", e);
+        }
     }
 
     @Operation(summary = "Créer une tâche dans un projet")
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public TaskResponse create(@PathVariable Long projectId, @Valid @RequestBody TaskCreateRequest request) {
-        Task task = new Task();
-        task.setTitle(request.title());
-        task.setDescription(request.description());
-        task.setDueDate(request.dueDate());
-        // task.setTenantId handled by service
+    public TaskResponse create(
+            @RequestHeader(value = "X-Tenant-ID", defaultValue = "default") String tenantId,
+            @PathVariable Long projectId,
+            @Valid @RequestBody TaskCreateRequest request
+    ) {
+        try {
+            Task task = new Task();
+            task.setTitle(request.title());
+            task.setDescription(request.description());
+            task.setDueDate(request.dueDate());
+            // task.setTenantId handled by service
 
-        Task created = taskUseCase.createTask(projectId, task, TenantContext.getTenant());
-        return mapToResponse(created);
+            Task created = taskUseCase.createTask(projectId, task, tenantId);
+            return mapToResponse(created);
+        } catch (IllegalArgumentException e) {
+             throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage(), e);
+        } catch (RuntimeException e) {
+             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Erreur lors de la création de la tâche", e);
+        }
     }
 
     private TaskResponse mapToResponse(Task task) {

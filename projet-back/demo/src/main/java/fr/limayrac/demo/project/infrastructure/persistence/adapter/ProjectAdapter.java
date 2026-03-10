@@ -6,6 +6,8 @@ import fr.limayrac.demo.project.infrastructure.persistence.entity.ProjectEntity;
 import fr.limayrac.demo.project.infrastructure.persistence.repository.ProjectRepository;
 import fr.limayrac.demo.dto.ProjectListResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -20,10 +22,16 @@ public class ProjectAdapter implements ProjectPort {
 
     @Override
     public List<Project> findAll(String tenantId) {
-        return projectRepository.findAllByTenantId(tenantId, org.springframework.data.domain.Pageable.unpaged())
+        return projectRepository.findAllByTenantId(tenantId, Pageable.unpaged())
                 .stream()
                 .map(this::toDomain)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public Page<Project> findAll(Pageable pageable, String tenantId) {
+        return projectRepository.findAllByTenantId(tenantId, pageable)
+                .map(this::toDomain);
     }
 
     @Override

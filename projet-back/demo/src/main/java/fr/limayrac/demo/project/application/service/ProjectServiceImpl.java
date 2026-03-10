@@ -6,6 +6,9 @@ import fr.limayrac.demo.project.domain.model.Project;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
 import java.util.List;
 
 @Service
@@ -32,6 +35,11 @@ public class ProjectServiceImpl implements ProjectUseCase {
     @Override
     public List<Project> getAll(String tenantId) {
         return projectPort.findAll(tenantId);
+    }
+
+    @Override
+    public Page<Project> getAll(Pageable pageable, String tenantId) {
+        return projectPort.findAll(pageable, tenantId);
     }
 
     @Override
